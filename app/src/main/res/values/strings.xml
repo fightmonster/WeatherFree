@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">WeatherFree</string>
+    <string name="search_city">Search city</string>
+    <string name="loading">Loading weather…</string>
+    <string name="temperature">%.0f°F</string>
+    <string name="humidity">Humidity: %d%%</string>
+    <string name="wind">Wind: %d mph</string>
+    <string name="feels_like">Feels like %.0f°F</string>
+    <string name="weather_condition">%s</string>
+    <string name="error_loading">Failed to load weather</string>
+    <string name="no_city_selected">No city selected</string>
+    <string name="enter_city_name">Enter city name or ZIP code</string>
+</resources>
