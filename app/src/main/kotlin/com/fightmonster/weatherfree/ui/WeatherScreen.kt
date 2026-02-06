@@ -1,7 +1,6 @@
 package com.fightmonster.weatherfree.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -67,7 +66,7 @@ fun WeatherScreen(viewModel: WeatherViewModel = viewModel()) {
                     selectedState = selectedState,
                     onStateSelected = { state ->
                         viewModel.onStateSelected(state)
-                    // Clear city selection when state changes
+                        // Clear city selection when state changes
                         viewModel.onCitySelected(null)
                     }
                 )
@@ -139,57 +138,41 @@ fun StateSelector(
         )
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "🌍 选择州",
+                text = "Select State",
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.padding(bottom = 8.dp)
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = it }
-                modifier = Modifier
-                    .fillMaxWidth()
             ) { exposedBox ->
                 OutlinedTextField(
                     value = searchText,
                     onValueChange = { searchText = it },
-                    placeholder = { Text("搜索或选择州...") },
+                    placeholder = { Text("Search states...") },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = "Search States",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            contentDescription = "Search States"
                         )
                     },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                     },
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        cursorColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                        unfocusedIndicatorColor = MaterialTheme.colorScheme.primaryContainer
-                    ),
                     modifier = Modifier.menuAnchor()
                 )
 
                 ExposedDropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier
-                        .exposedDropdownSize(true)
-                        .background(MaterialTheme.colorScheme.surface)
+                    onDismissRequest = { expanded = false }
                 ) {
                     LazyColumn(
-                        modifier = Modifier
-                            .heightIn(max = 300.dp)
+                        modifier = Modifier.heightIn(max = 300.dp)
                     ) {
                         items(filteredStates) { state ->
                             DropdownMenuItem(
@@ -255,31 +238,26 @@ fun CitySelector(
         )
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "🏙️ 选择城市",
+                text = "Select City",
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.padding(bottom = 8.dp)
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
-                onExpandedChange = { expanded = it },
-                modifier = Modifier
-                    .fillMaxWidth()
+                onExpandedChange = { expanded = it }
             ) { exposedBox ->
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = onSearchQueryChange,
-                    placeholder = { Text("搜索或选择城市...") },
+                    placeholder = { Text("Search cities...") },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.LocationCity,
-                            contentDescription = "Search Cities",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            contentDescription = "Search Cities"
                         )
                     },
                     trailingIcon = {
@@ -295,26 +273,15 @@ fun CitySelector(
                         }
                     ),
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        cursorColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                        unfocusedIndicatorColor = MaterialTheme.colorScheme.primaryContainer
-                    ),
                     modifier = Modifier.menuAnchor()
                 )
 
                 ExposedDropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier
-                        .exposedDropdownSize(true)
-                        .background(MaterialTheme.colorScheme.surface)
+                    onDismissRequest = { expanded = false }
                 ) {
                     LazyColumn(
-                        modifier = Modifier
-                            .heightIn(max = 400.dp)
+                        modifier = Modifier.heightIn(max = 400.dp)
                     ) {
                         items(filteredCities) { city ->
                             DropdownMenuItem(
@@ -399,64 +366,36 @@ fun CurrentWeatherCard(weather: Period) {
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         shape = RoundedCornerShape(24.dp)
-        border = if (weather.isDaytime) {
-            CardDefaults.outlinedCardBorderBrush()
-        } else null
     ) {
         Column(
             modifier = Modifier
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Location name
             Text(
                 text = weather.name,
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                textAlign = TextAlign.Center
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Temperature with icon
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Weather icon
-                Text(
-                    text = when {
-                        weather.shortForecast.contains("Sunny", ignoreCase = true) -> "☀️"
-                        weather.shortForecast.contains("Cloud", ignoreCase = true) -> "☁️"
-                        weather.shortForecast.contains("Rain", ignoreCase = true) -> "🌧"
-                        weather.shortForecast.contains("Snow", ignoreCase = true) -> "❄️"
-                        weather.shortForecast.contains("Thunder", ignoreCase = true) -> "⛈"
-                        else -> "🌤️"
-                    },
-                    style = MaterialTheme.typography.displayLarge
-                )
+            Text(
+                text = "${weather.temperature}°${weather.temperatureUnit}",
+                style = MaterialTheme.typography.displayLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
 
-                // Temperature
-                Text(
-                    text = "${weather.temperature}°${weather.temperatureUnit}",
-                    style = MaterialTheme.typography.displayLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Short forecast
             Text(
                 text = weather.shortForecast,
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                textAlign = TextAlign.Center
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Details row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -482,13 +421,8 @@ fun ForecastItem(period: Period) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (period.isDaytime) {
-                MaterialTheme.colorScheme.surface
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            }
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
         Row(
             modifier = Modifier
@@ -506,43 +440,17 @@ fun ForecastItem(period: Period) {
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = when {
-                            period.shortForecast.contains("Sunny", ignoreCase = true) -> "☀️"
-                            period.shortForecast.contains("Cloud", ignoreCase = true) -> "☁️"
-                            period.shortForecast.contains("Rain", ignoreCase = true) -> "🌧"
-                            period.shortForecast.contains("Snow", ignoreCase = true) -> "❄️"
-                            period.shortForecast.contains("Thunder", ignoreCase = true) -> "⛈"
-                            else -> "🌤️"
-                        },
-                        style = MaterialTheme.typography.titleLarge
-                    )
-
-                    Text(
-                        text = "${period.temperature}°${period.temperatureUnit}",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
                 Text(
                     text = period.shortForecast,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
-            // Date
             Text(
-                text = period.startTime.substring(0, 10),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = "${period.temperature}°${period.temperatureUnit}",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -586,8 +494,7 @@ fun ErrorCard(message: String, onRetry: () -> Unit) {
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
-            modifier = Modifier
-                .padding(24.dp),
+            modifier = Modifier.padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -607,7 +514,7 @@ fun ErrorCard(message: String, onRetry: () -> Unit) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = onRetry
+                onClick = onRetry,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.error
                 )
@@ -642,7 +549,7 @@ fun EmptyState() {
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "选择您的州和城市",
+                text = "Select State and City",
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
@@ -650,7 +557,7 @@ fun EmptyState() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "第一步：选择州",
+                text = "Step 1: Select a state",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
@@ -658,7 +565,7 @@ fun EmptyState() {
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "第二步：选择该州的城市",
+                text = "Step 2: Select a city from that state",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
@@ -666,7 +573,7 @@ fun EmptyState() {
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "📍 支持所有50个美国州和200+主要城市",
+                text = "📍 Supports all 50 US states and 200+ major cities",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                 textAlign = TextAlign.Center
