@@ -1,12 +1,9 @@
 package com.fightmonster.weatherfree.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
@@ -19,10 +16,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fightmonster.weatherfree.data.Period
 import com.fightmonster.weatherfree.data.USCity
@@ -35,8 +31,12 @@ import com.fightmonster.weatherfree.viewmodel.WeatherViewModel
 fun WeatherScreen(viewModel: WeatherViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     val selectedState by viewModel.selectedState.collectAsState()
-    val cities = remember(selectedState) { state ->
-        state?.let { USCities[it.code] } ?: emptyList()
+    val cities: List<USCity> = remember(selectedState) { state ->
+        if (state != null) {
+            USCities[state!!.code] ?: emptyList()
+        } else {
+            emptyList()
+        }
     }
 
     Scaffold(
@@ -55,23 +55,19 @@ fun WeatherScreen(viewModel: WeatherViewModel = viewModel()) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Two-column layout for cascading selection
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // First column: State selection
                 StateSelector(
                     states = USStates,
                     selectedState = selectedState,
                     onStateSelected = { state ->
                         viewModel.onStateSelected(state)
-                        // Clear city selection when state changes
                         viewModel.onCitySelected(null)
                     }
                 )
 
-                // Second column: City selection (only visible when state is selected)
                 if (selectedState != null) {
                     CitySelector(
                         cities = cities,
@@ -123,7 +119,7 @@ fun StateSelector(
     var expanded by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
 
-    val filteredStates = remember(searchText) {
+    val filteredStates: List<com.fightmonster.weatherfree.data.USState> = remember(searchText) {
         if (searchText.isEmpty()) {
             states
         } else {
@@ -132,14 +128,12 @@ fun StateSelector(
     }
 
     Card(
-        modifier = Modifier.weight(1f),
+        modifier = Modifier.fillMaxWidth().weight(1f),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
         )
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = "Select State",
                 style = MaterialTheme.typography.titleMedium,
@@ -155,25 +149,18 @@ fun StateSelector(
                     onValueChange = { searchText = it },
                     placeholder = { Text("Search states...") },
                     leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search States"
-                        )
+                        Icon(imageVector = Icons.Default.Search, contentDescription = null)
                     },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     singleLine = true,
-                    modifier = Modifier.menuAnchor()
+                    modifier = Modifier.menuAnchor(ExposedDropdownMenuBoxScope.MenuAnchor)
                 )
 
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    LazyColumn(
-                        modifier = Modifier.heightIn(max = 300.dp)
-                    ) {
+                    LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
                         items(filteredStates) { state ->
                             DropdownMenuItem(
                                 text = {
@@ -189,9 +176,9 @@ fun StateSelector(
                                 leadingIcon = if (selectedState?.code == state.code) {
                                     {
                                         Icon(
-                                            imageVector = Icons.Default.Check,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.primary
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.primary
                                         )
                                     }
                                 } else null,
@@ -219,7 +206,7 @@ fun CitySelector(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val filteredCities = remember(searchQuery) {
+    val filteredCities: List<USCity> = remember(searchQuery) {
         if (searchQuery.isEmpty()) {
             cities
         } else {
@@ -232,14 +219,12 @@ fun CitySelector(
     }
 
     Card(
-        modifier = Modifier.weight(1f),
+        modifier = Modifier.fillMaxWidth().weight(1f),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
         )
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = "Select City",
                 style = MaterialTheme.typography.titleMedium,
@@ -255,34 +240,18 @@ fun CitySelector(
                     onValueChange = onSearchQueryChange,
                     placeholder = { Text("Search cities...") },
                     leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.LocationCity,
-                            contentDescription = "Search Cities"
-                        )
+                        Icon(imageVector = Icons.Default.LocationCity, contentDescription = null)
                     },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(
-                        onSearch = {
-                            if (searchQuery.isNotBlank()) {
-                                val city = filteredCities.firstOrNull()
-                                city?.let { onCitySelected(it.name) }
-                            }
-                        }
-                    ),
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     singleLine = true,
-                    modifier = Modifier.menuAnchor()
+                    modifier = Modifier.menuAnchor(ExposedDropdownMenuBoxScope.MenuAnchor)
                 )
 
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    LazyColumn(
-                        modifier = Modifier.heightIn(max = 400.dp)
-                    ) {
+                    LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
                         items(filteredCities) { city ->
                             DropdownMenuItem(
                                 text = {
@@ -334,12 +303,10 @@ fun WeatherContent(
     forecast: List<Period>
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        // Current Weather
         CurrentWeatherCard(weather = currentWeather)
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Forecast
         Text(
             text = "7-Day Forecast",
             style = MaterialTheme.typography.titleLarge,
@@ -348,9 +315,7 @@ fun WeatherContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(forecast.take(7)) { period ->
                 ForecastItem(period = period)
             }
@@ -404,12 +369,12 @@ fun CurrentWeatherCard(weather: Period) {
                 WeatherDetail(
                     label = "Wind",
                     value = weather.windSpeed,
-                    icon = "💨"
+                    icon = "Wind"
                 )
                 WeatherDetail(
                     label = "Humidity",
                     value = "${weather.relativeHumidity?.value ?: 0}%",
-                    icon = "💧"
+                    icon = "Drop"
                 )
             }
         }
@@ -498,7 +463,7 @@ fun ErrorCard(message: String, onRetry: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "❌",
+                text = "Error",
                 style = MaterialTheme.typography.displayMedium
             )
 
@@ -519,7 +484,7 @@ fun ErrorCard(message: String, onRetry: () -> Unit) {
                     containerColor = MaterialTheme.colorScheme.error
                 )
             ) {
-                Text("Retry", color = MaterialTheme.colorScheme.onError)
+                Text("Retry")
             }
         }
     }
@@ -534,19 +499,11 @@ fun EmptyState() {
         )
     ) {
         Column(
-            modifier = Modifier
-                .padding(48.dp),
+            modifier = Modifier.padding(48.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.height(32.dp))
-
-            Text(
-                text = "🌤️",
-                style = MaterialTheme.typography.displayLarge
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = "Select State and City",
@@ -573,7 +530,7 @@ fun EmptyState() {
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "📍 Supports all 50 US states and 200+ major cities",
+                text = "Supports all 50 US states and 200+ major cities",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                 textAlign = TextAlign.Center
