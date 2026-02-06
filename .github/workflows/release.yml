@@ -37,24 +37,15 @@ jobs:
           cp release.keystore app/release.keystore
           echo "✓ Keystore copied to app directory"
 
-      - name: Create keystore.properties for Gradle
-        run: |
-          echo "STORE_FILE=release.keystore" > keystore.properties
-          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> keystore.properties
-          echo "STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> keystore.properties
-          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> keystore.properties
-          echo "✓ keystore.properties created"
-
-      - name: Copy keystore.properties to app directory
-        run: |
-          cp keystore.properties app/keystore.properties
-          echo "✓ keystore.properties copied to app directory"
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build Signed Debug APK
         run: ./gradlew assembleDebug --no-daemon
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Get version name
         id: version
@@ -85,24 +76,44 @@ jobs:
             ## 📱 WeatherFree ${{ steps.version.outputs.tag }}
 
             ### 📥 Download
-            - **Signed Debug APK**: Debug build with official signing key
+            - **Signed Debug APK**: Debug build with official WeatherFree signing key
 
             ### ✨ Features
-            - Free & Open Source
+            - Free & Open Source - No API keys required
             - Real-time Weather Data from National Weather Service
-            - Modern UI with Jetpack Compose
-            - Material You Design
+            - Modern UI with Jetpack Compose and Material You
             - 7-Day Forecast
-            - Multiple US Cities Support
+            - State & City Selection - Easy location access with dropdown menus
+            - Material 3 Design System
+
+            ### 🌍 Supported States & Cities
+            - All 50 US States (Alabama, Alaska, Arizona, etc.)
+            - 200+ Major US Cities with ZIP codes
+            - Search by city name, state, or ZIP code
+            - Dropdown menus for easy selection
+
+            ### 🎯 How to Use
+            1. Select a state from the dropdown
+            2. Select a city from the filtered list (or search)
+            3. View current weather and 7-day forecast
 
             ### 🔒 Security
-            This APK is signed with official WeatherFree signing key.
+            This APK is signed with the official WeatherFree signing key.
+            Ensures authentic installation and seamless updates.
 
             ### ⚙️ Building from Source
             ```bash
+            # Clone repository
             git clone https://github.com/fightmonster/WeatherFree.git
             cd WeatherFree
+
+            # Build debug APK (uses auto-generated debug key)
             ./gradlew assembleDebug
+
+            # Build signed release APK (requires signing setup)
+            # Generate keystore: keytool -genkey -v -keystore release.keystore -alias weatherfree -keyalg RSA -keysize 2048 -validity 10000
+            # Create keystore.properties with your credentials
+            ./gradlew assembleRelease
             ```
           files: |
             WeatherFree-${{ steps.version.outputs.tag }}-signed-debug.apk
