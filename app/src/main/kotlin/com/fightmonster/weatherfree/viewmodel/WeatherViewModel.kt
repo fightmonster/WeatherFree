@@ -41,10 +41,9 @@ class WeatherViewModel : ViewModel() {
     fun onCitySelected(city: String?) {
         _selectedCity.value = city
         city?.let {
-            // Find city in data and get coordinates
             val cityData = USCities.values.flatten().find { it.name == city }
             if (cityData != null) {
-                fetchWeather(cityData!!.coordinates.first, cityData!!.coordinates.second)
+                fetchWeather(cityData!!.latitude, cityData!!.longitude)
             }
         }
     }
