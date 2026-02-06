@@ -1,0 +1,123 @@
+name: Build and Release Signed APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.1'
+      create_release:
+        description: 'Create GitHub Release'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  build-sign-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Generate signing keystore
+        run: |
+          keytool -genkey -v \
+            -keystore release.keystore \
+            -alias weatherfree \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass '${{ secrets.KEYSTORE_PASSWORD }}' \
+            -keypass '${{ secrets.KEY_PASSWORD }}' \
+            -dname 'CN=WeatherFree, OU=Development, O=FightMonster, L=City, ST=State, C=US'
+
+      - name: Create keystore properties
+        run: |
+          echo "STORE_FILE=release.keystore" > keystore.properties
+          echo "KEY_ALIAS=weatherfree" >> keystore.properties
+          echo "STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> keystore.properties
+          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> keystore.properties
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Build Signed Release APK
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Get version name
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Rename APK files
+        run: |
+          mv app/build/outputs/apk/debug/app-debug.apk WeatherFree-${{ steps.version.outputs.tag }}-debug.apk
+          mv app/build/outputs/apk/release/app-release.apk WeatherFree-${{ steps.version.outputs.tag }}-release.apk
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: WeatherFree-${{ steps.version.outputs.tag }}-debug
+          path: WeatherFree-${{ steps.version.outputs.tag }}-debug.apk
+          retention-days: 90
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: WeatherFree-${{ steps.version.outputs.tag }}-release
+          path: WeatherFree-${{ steps.version.outputs.tag }}-release.apk
+          retention-days: 90
+
+      - name: Create GitHub Release
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true')
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: WeatherFree ${{ steps.version.outputs.tag }}
+          body: |
+            ## 📱 WeatherFree ${{ steps.version.outputs.tag }}
+
+            ### 📥 Downloads
+            - **Debug APK**: For testing and development
+            - **Release APK**: Signed production build
+
+            ### ✨ Features
+            - Free & Open Source
+            - Real-time Weather Data
+            - Modern UI with Jetpack Compose
+            - Material You Design
+            - 7-Day Forecast
+            - Multiple US Cities Support
+
+            ### 🔒 Security
+            This release is signed with the official WeatherFree signing key.
+          files: |
+            WeatherFree-${{ steps.version.outputs.tag }}-debug.apk
+            WeatherFree-${{ steps.version.outputs.tag }}-release.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
