@@ -1,4 +1,4 @@
-name: Build and Release Signed APK
+name: Build and Release Debug APK
 
 on:
   push:
@@ -9,18 +9,10 @@ on:
       tag_name:
         description: 'Release tag (e.g., v1.0.0)'
         required: true
-        default: 'v1.0.2'
-      create_release:
-        description: 'Create GitHub Release'
-        required: true
-        default: 'true'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+        default: 'v1.0.0'
 
 jobs:
-  build-sign-release:
+  build-debug:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,33 +27,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Decode keystore from GitHub Secrets
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
-          echo "✓ Keystore decoded successfully"
-
-      - name: Create keystore properties
-        run: |
-          echo "STORE_FILE=release.keystore" > keystore.properties
-          echo "KEY_ALIAS=weatherfree" >> keystore.properties
-          echo "STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> keystore.properties
-          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> keystore.properties
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --no-daemon
-
-      - name: Build Signed Release APK
-        run: ./gradlew assembleRelease --no-daemon
-
-      - name: List APK files
-        run: |
-          echo "=== Debug APKs ==="
-          find app/build/outputs/apk -name "*.apk" -type f
-          echo "=== All APKs ==="
-          find app/build/outputs -name "*.apk" -type f
 
       - name: Get version name
         id: version
@@ -72,17 +42,9 @@ jobs:
             echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Find and Rename APK files
+      - name: Rename APK file
         run: |
-          # Find debug APK
-          DEBUG_APK=$(find app/build/outputs/apk/debug -name "*.apk" -type f | head -1)
-          echo "Debug APK: $DEBUG_APK"
-          cp "$DEBUG_APK" WeatherFree-${{ steps.version.outputs.tag }}-debug.apk
-
-          # Find release APK
-          RELEASE_APK=$(find app/build/outputs -name "*.apk" -type f | grep -v debug | head -1)
-          echo "Release APK: $RELEASE_APK"
-          cp "$RELEASE_APK" WeatherFree-${{ steps.version.outputs.tag }}-release.apk
+          cp app/build/outputs/apk/debug/app-debug.apk WeatherFree-${{ steps.version.outputs.tag }}-debug.apk
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
@@ -91,15 +53,7 @@ jobs:
           path: WeatherFree-${{ steps.version.outputs.tag }}-debug.apk
           retention-days: 90
 
-      - name: Upload Release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: WeatherFree-${{ steps.version.outputs.tag }}-release
-          path: WeatherFree-${{ steps.version.outputs.tag }}-release.apk
-          retention-days: 90
-
       - name: Create GitHub Release
-        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true')
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.tag }}
@@ -107,9 +61,8 @@ jobs:
           body: |
             ## 📱 WeatherFree ${{ steps.version.outputs.tag }}
 
-            ### 📥 Downloads
+            ### 📥 Download
             - **Debug APK**: For testing and development
-            - **Release APK**: Signed production build
 
             ### ✨ Features
             - Free & Open Source
@@ -119,30 +72,14 @@ jobs:
             - 7-Day Forecast
             - Multiple US Cities Support
 
-            ### 🔒 Security
-            This release is signed with the official WeatherFree signing key.
-
             ### ⚙️ Building from Source
             ```bash
-            # Clone the repository
             git clone https://github.com/fightmonster/WeatherFree.git
             cd WeatherFree
-
-            # Build debug APK (uses auto-generated debug key)
             ./gradlew assembleDebug
-
-            # For release signing, create your own keystore.properties:
-            # STORE_FILE=your-release.keystore
-            # KEY_ALIAS=your-alias
-            # STORE_PASSWORD=your-password
-            # KEY_PASSWORD=your-password
-
-            # Then build release APK
-            ./gradlew assembleRelease
             ```
           files: |
             WeatherFree-${{ steps.version.outputs.tag }}-debug.apk
-            WeatherFree-${{ steps.version.outputs.tag }}-release.apk
           draft: false
           prerelease: false
         env:
