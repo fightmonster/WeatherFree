@@ -37,15 +37,24 @@ jobs:
           cp release.keystore app/release.keystore
           echo "✓ Keystore copied to app directory"
 
+      - name: Create keystore.properties for Gradle
+        run: |
+          echo "STORE_FILE=release.keystore" > keystore.properties
+          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> keystore.properties
+          echo "STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> keystore.properties
+          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> keystore.properties
+          echo "✓ keystore.properties created"
+
+      - name: Copy keystore.properties to app directory
+        run: |
+          cp keystore.properties app/keystore.properties
+          echo "✓ keystore.properties copied to app directory"
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build Signed Debug APK
         run: ./gradlew assembleDebug --no-daemon
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: weatherfree
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Get version name
         id: version
@@ -87,7 +96,7 @@ jobs:
             - Multiple US Cities Support
 
             ### 🔒 Security
-            This APK is signed with the official WeatherFree signing key.
+            This APK is signed with official WeatherFree signing key.
 
             ### ⚙️ Building from Source
             ```bash
