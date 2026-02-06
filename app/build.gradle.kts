@@ -24,15 +24,14 @@ android {
     signingConfigs {
         create("release") {
             storeFile = file("release.keystore")
-            storePassword = System.getenv("KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("KEY_ALIAS")
-            keyPassword = System.getenv("KEY_PASSWORD")
+            storePassword = project.findProperty("KEYSTORE_PASSWORD")
+            keyAlias = project.findProperty("KEY_ALIAS")
+            keyPassword = project.findProperty("KEY_PASSWORD")
         }
     }
 
     buildTypes {
         debug {
-            // Use release signing for debug APK too
             signingConfig = signingConfigs.getByName("release")
         }
         release {
