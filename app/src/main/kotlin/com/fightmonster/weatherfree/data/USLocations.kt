@@ -65,17 +65,16 @@ val USStates = listOf(
     USState("Virgin Islands", "VI")
 )
 
-// US Cities Data
+// US Cities Data with coordinates
 data class USCity(
     val name: String,
     val state: String,
     val zip: String,
-    val latitude: Double,
-    val longitude: Double
+    val coordinates: Pair<Double, Double>
 )
 
 // Major US Cities by State with coordinates
-// These coordinates are approximate city centers for the NWS API
+// These coordinates are approximate city centers for NWS API
 val USCities = mapOf(
     "AL" to listOf(
         USCity("Birmingham", "AL", "35203", 33.5207 to -86.8025),
@@ -141,7 +140,7 @@ val USCities = mapOf(
     ),
     "ID" to listOf(
         USCity("Boise", "ID", "83701", 43.6150 to -116.2023),
-        USCity("Coeur d'Alene", "ID", "83814", 47.6777 to -116.7805)
+        USCity("Coeur d'Alene", "ID", "83814", 46.8777 to -116.7805)
     ),
     "IL" to listOf(
         USCity("Chicago", "IL", "60601", 41.8781 to -87.6298),
@@ -156,8 +155,8 @@ val USCities = mapOf(
     ),
     "IA" to listOf(
         USCity("Des Moines", "IA", "50301", 41.6005 to -93.6091),
-        USCity("Cedar Rapids", "IA", "52401", 41.9768 to -91.6656),
-        USCity("Davenport", "IA", "52801", 41.5236 to -90.5776)
+        USCity("Cedar Rapids", "IA", "52401", 41.8768 to -91.6656),
+        USCity("Davenport", "IA", "52801", 41.5236 to -90.7676)
     ),
     "KS" to listOf(
         USCity("Wichita", "KS", "67201", 37.6872 to -97.3301),
@@ -172,7 +171,7 @@ val USCities = mapOf(
     "LA" to listOf(
         USCity("New Orleans", "LA", "70101", 29.9511 to -90.0715),
         USCity("Baton Rouge", "LA", "70801", 30.4515 to -91.1871),
-        USCity("Shreveport", "LA", "71101", 32.5252 to -93.7502)
+        USCity("Shreveport", "LA", "71101", 32.4751 to -93.7502)
     ),
     "MA" to listOf(
         USCity("Boston", "MA", "02101", 42.3601 to -71.0589),
@@ -180,19 +179,19 @@ val USCities = mapOf(
         USCity("Springfield", "MA", "01101", 42.1015 to -72.5898),
         USCity("Cambridge", "MA", "02139", 42.3601 to -71.0589)
     ),
+    "ME" to listOf(
+        USCity("Portland", "ME", "04101", 43.6591 to -70.2568),
+        USCity("Augusta", "ME", "04330", 43.9967 to -69.7785),
+        USCity("Bangor", "ME", "04401", 44.8011 to -68.7676)
+    ),
     "MD" to listOf(
         USCity("Baltimore", "MD", "21201", 39.2904 to -76.6122),
         USCity("Annapolis", "MD", "21401", 38.9784 to -76.4918),
         USCity("Silver Spring", "MD", "20901", 39.0053 to -77.0231)
     ),
-    "ME" to listOf(
-        USCity("Portland", "ME", "04101", 43.6591 to -70.2568),
-        USCity("Augusta", "ME", "04330", 44.3106 to -69.7795),
-        USCity("Bangor", "ME", "04401", 44.8011 to -68.7676)
-    ),
     "MI" to listOf(
         USCity("Detroit", "MI", "48201", 42.3314 to -83.0458),
-        USCity("Grand Rapids", "MI", "49501", 42.9634 to -85.6681),
+        USCity("Grand Rapids", "MI", "49501", 42.9664 to -85.6681),
         USCity("Lansing", "MI", "48901", 42.7325 to -84.5553),
         USCity("Ann Arbor", "MI", "48103", 42.2808 to -83.7430)
     ),
@@ -213,144 +212,133 @@ val USCities = mapOf(
     ),
     "MT" to listOf(
         USCity("Billings", "MT", "59101", 45.7833 to -108.5007),
-        USCity("Missoula", "MT", "59801", 46.8721 to -113.9966),
+        USCity("Missoula", "MT", "59801", 46.8772 to -114.0133),
         USCity("Great Falls", "MT", "59401", 47.5029 to -111.3008)
-    ),
-    "NC" to listOf(
-        USCity("Charlotte", "NC", "28201", 35.2271 to -80.8431),
-        USCity("Raleigh", "NC", "27601", 35.7796 to -78.6382),
-        USCity("Greensboro", "NC", "27401", 36.0726 to -79.7920),
-        USCity("Winston-Salem", "NC", "27101", 36.0999 to -80.2442)
-    ),
-    "ND" to listOf(
-        USCity("Fargo", "ND", "58101", 46.8772 to -96.7898),
-        USCity("Bismarck", "ND", "58501", 46.8083 to -100.7837),
-        USCity("Grand Forks", "ND", "58201", 47.9253 to -97.0333)
     ),
     "NE" to listOf(
         USCity("Omaha", "NE", "68101", 41.2565 to -95.9345),
         USCity("Lincoln", "NE", "68501", 40.8136 to -96.7026),
-        USCity("Bellevue", "NE", "68005", 41.1346 to -95.9333)
+        USCity("Bellevue", "NE", "68005", 41.1346 to -95.9333")
     ),
     "NV" to listOf(
         USCity("Las Vegas", "NV", "89101", 36.1699 to -115.1398),
         USCity("Reno", "NV", "89501", 39.5296 to -119.8138),
-        USCity("Henderson", "NV", "89002", 36.0395 to -114.9817)
+        USCity("Henderson", "NV", "89002", 36.0629 to -114.9817)
     ),
     "NH" to listOf(
         USCity("Manchester", "NH", "03101", 42.9956 to -71.4548),
-        USCity("Nashua", "NH", "03060", 42.7654 to -71.4626),
-        USCity("Concord", "NH", "03301", 43.2081 to -71.5378)
+        USCity("Nashua", "NH", "03060", 42.7646 to -71.4626),
+        USCity("Concord", "NH", "03301", 43.2081 to -71.5378")
     ),
     "NJ" to listOf(
         USCity("Newark", "NJ", "07101", 40.7357 to -74.1724),
         USCity("Jersey City", "NJ", "07302", 40.7178 to -74.0432),
-        USCity("Paterson", "NJ", "07501", 40.9168 to -74.1718),
-        USCity("Trenton", "NJ", "08601", 40.2177 to -74.7429)
+        USCity("Paterson", "NJ", "07501", 40.9168 to -74.1718"),
+        USCity("Trenton", "NJ", "08601", 40.2177 to -74.7429")
     ),
     "NM" to listOf(
         USCity("Albuquerque", "NM", "87101", 35.0844 to -106.6504),
         USCity("Santa Fe", "NM", "87501", 35.6870 to -105.9379),
-        USCity("Las Cruces", "NM", "88001", 32.3122 to -106.7758)
+        USCity("Las Cruces", "NM", "88001", 32.3122 to -106.7758")
     ),
     "NY" to listOf(
         USCity("New York", "NY", "10001", 40.7128 to -74.0060),
         USCity("Buffalo", "NY", "14201", 42.8864 to -78.8784),
         USCity("Rochester", "NY", "14601", 43.1566 to -77.6088),
         USCity("Albany", "NY", "12201", 42.6526 to -73.7562),
-        USCity("Syracuse", "NY", "13201", 43.0481 to -76.1474)
+        USCity("Syracuse", "NY", "13201", 43.0481 to -76.1474")
     ),
     "OH" to listOf(
         USCity("Columbus", "OH", "43201", 39.9612 to -82.9988),
         USCity("Cleveland", "OH", "44101", 41.4993 to -81.6944),
         USCity("Cincinnati", "OH", "45201", 39.1031 to -84.5120),
-        USCity("Toledo", "OH", "43601", 41.6528 to -83.5379)
+        USCity("Toledo", "OH", "43601", 41.6528 to -83.5379")
     ),
     "OK" to listOf(
         USCity("Oklahoma City", "OK", "73101", 35.4676 to -97.5164),
         USCity("Tulsa", "OK", "74101", 36.1540 to -95.9928),
-        USCity("Norman", "OK", "73019", 35.2226 to -97.4395)
+        USCity("Norman", "OK", "73019", 41.2981 to -97.4395")
     ),
     "OR" to listOf(
         USCity("Portland", "OR", "97201", 45.5152 to -122.6784),
-        USCity("Eugene", "OR", "97401", 44.0521 to -123.0868),
+        USCity("Eugene", "OR", "97401", 44.0215 to -123.0868),
         USCity("Salem", "OR", "97301", 44.9429 to -123.0322),
-        USCity("Gresham", "OR", "97080", 45.5007 to -122.4526)
+        USCity("Gresham", "OR", "97080", 45.5007 to -122.4526")
     ),
     "PA" to listOf(
         USCity("Philadelphia", "PA", "19101", 39.9526 to -75.1652),
         USCity("Pittsburgh", "PA", "15201", 40.4406 to -79.9959),
         USCity("Allentown", "PA", "18101", 40.6026 to -75.4791),
-        USCity("Erie", "PA", "16501", 42.1292 to -80.0851)
+        USCity("Erie", "PA", "16501", 42.1292 to -80.0851")
     ),
     "RI" to listOf(
         USCity("Providence", "RI", "02901", 41.8240 to -71.4128),
-        USCity("Warwick", "RI", "02886", 41.7001 to -71.4332),
-        USCity("Cranston", "RI", "02920", 41.7763 to -71.4332)
+        USCity("Warwick", "RI", "02886", 41.7663 to -71.4332"),
+        USCity("Cranston", "RI", "02920", 41.7663 to -71.4332")
     ),
     "SC" to listOf(
         USCity("Columbia", "SC", "29201", 34.0007 to -81.0348),
         USCity("Charleston", "SC", "29401", 32.7766 to -79.9312),
-        USCity("Greenville", "SC", "29601", 34.8526 to -82.3940)
+        USCity("Greenville", "SC", "29601", 34.8526 to -82.3940")
     ),
     "SD" to listOf(
-        USCity("Sioux Falls", "SD", "57101", 43.5446 to -96.7311),
-        USCity("Rapid City", "SD", "57701", 44.0808 to -96.7208),
-        USCity("Aberdeen", "SD", "57401", 45.4646 to -98.4858)
+        USCity("Sioux Falls", "SD", "57101", 43.5698 to -96.7311),
+        USCity("Rapid City", "SD", "57701", 44.6808 to -103.0133),
+        USCity("Aberdeen", "SD", "57401", 45.4646 to -96.9858")
     ),
     "TN" to listOf(
         USCity("Nashville", "TN", "37201", 36.1627 to -86.7816),
         USCity("Memphis", "TN", "38101", 35.1495 to -90.0490),
-        USCity("Knoxville", "TN", "37901", 35.9606 to -83.9208),
-        USCity("Chattanooga", "TN", "37401", 35.0456 to -85.3097)
+        USCity("Knoxville", "TN", "37901", 35.9606 to -83.9208"),
+        USCity("Chattanooga", "TN", "37401", 35.0456 to -85.3097")
     ),
     "TX" to listOf(
         USCity("Houston", "TX", "77001", 29.7604 to -95.3698),
         USCity("Dallas", "TX", "75201", 32.7767 to -96.7970),
         USCity("San Antonio", "TX", "78201", 29.4241 to -98.4936),
         USCity("Austin", "TX", "78701", 30.2672 to -97.7431),
-        USCity("Fort Worth", "TX", "76101", 32.7257 to -97.3208),
-        USCity("El Paso", "TX", "79901", 31.7619 to -106.4850)
+        USCity("Fort Worth", "TX", "76101", 32.7574 to -97.3208),
+        USCity("El Paso", "TX", "79901", 31.7619 to -106.4850")
     ),
     "UT" to listOf(
         USCity("Salt Lake City", "UT", "84101", 40.7608 to -111.8910),
         USCity("Provo", "UT", "84601", 40.2338 to -111.6585),
-        USCity("Ogden", "UT", "84401", 41.2225 to -111.9730)
+        USCity("Ogden", "UT", "84401", 41.2225 to -111.9730")
     ),
     "VT" to listOf(
         USCity("Burlington", "VT", "05401", 44.4759 to -73.2121),
         USCity("South Burlington", "VT", "05403", 44.4668 to -73.1872),
-        USCity("Rutland", "VT", "05701", 43.6106 to -72.9726)
+        USCity("Rutland", "VT", "05701", 43.6106 to -72.6726")
     ),
     "VA" to listOf(
-        USCity("Virginia Beach", "VA", "23451", 36.8529 to -75.9774),
+        USCity("Virginia Beach", "VA", "23451", 36.8529 to -76.9774),
         USCity("Norfolk", "VA", "23501", 36.8468 to -76.2852),
         USCity("Richmond", "VA", "23219", 37.5407 to -77.4360),
-        USCity("Arlington", "VA", "22201", 38.8815 to -77.1043)
+        USCity("Arlington", "VA", "22201", 38.8815 to -77.1043")
     ),
     "WA" to listOf(
         USCity("Seattle", "WA", "98101", 47.6062 to -122.3321),
         USCity("Spokane", "WA", "99201", 47.6588 to -117.4260),
         USCity("Tacoma", "WA", "98401", 47.2529 to -122.4443),
-        USCity("Bellevue", "WA", "98004", 47.6101 to -122.2015)
+        USCity("Bellevue", "WA", "98004", 47.6101 to -122.2015")
     ),
     "WV" to listOf(
         USCity("Charleston", "WV", "25301", 38.3498 to -81.6326),
         USCity("Huntington", "WV", "25701", 38.4192 to -82.4452),
-        USCity("Parkersburg", "WV", "26101", 37.2989 to -81.5873")
+        USCity("Parkersburg", "WV", "26101", 39.0114 to -81.5873")
     ),
     "WI" to listOf(
         USCity("Milwaukee", "WI", "53201", 43.0389 to -87.9065),
-        USCity("Madison", "WI", "53701", 43.0731 to -89.4012),
-        USCity("Green Bay", "WI", "54301", 44.5133 to -88.0133)
+        USCity("Madison", "WI", "53701", 43.0731 to -89.4012"),
+        USCity("Green Bay", "WI", "54301", 44.5133 to -88.0133")
     ),
     "WY" to listOf(
         USCity("Cheyenne", "WY", "82001", 41.1400 to -104.8197),
         USCity("Casper", "WY", "82601", 42.8666 to -106.3131),
-        USCity("Laramie", "WY", "82070", 41.3114 to -105.5909)
+        USCity("Laramie", "WY", "82070", 41.3114 to -105.5909")
     ),
     "DC" to listOf(
-        USCity("Washington", "DC", "20001", 38.9072 to -77.0369)
+        USCity("Washington", "DC", "20001", 38.9072 to -77.0369")
     ),
     "PR" to listOf(
         USCity("San Juan", "PR", "00901", 18.4663 to -66.1057)
