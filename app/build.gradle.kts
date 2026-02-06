@@ -32,7 +32,8 @@ android {
 
     buildTypes {
         debug {
-            signingConfig = signingConfigs.getByName("debug")
+            // Use release signing for debug APK too
+            signingConfig = signingConfigs.getByName("release")
         }
         release {
             isMinifyEnabled = false
