@@ -3,6 +3,9 @@ package com.fightmonster.weatherfree.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fightmonster.weatherfree.data.Period
+import com.fightmonster.weatherfree.data.USCity
+import com.fightmonster.weatherfree.data.USState
+import com.fightmonster.weatherfree.data.USCities
 import com.fightmonster.weatherfree.data.WeatherRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,40 +25,64 @@ class WeatherViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(WeatherUiState())
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
 
+    private val _selectedState = MutableStateFlow<USState?>(null)
+    val selectedState: StateFlow<USState?> = _selectedState.asStateFlow()
+
+    private val _selectedCity = MutableStateFlow<String?>(null)
+    val selectedCity: StateFlow<String?> = _selectedCity.asStateFlow()
+
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     private val _selectedLocation = MutableStateFlow<Pair<Double, Double>?>(null)
     val selectedLocation: StateFlow<Pair<Double, Double>?> = _selectedLocation.asStateFlow()
 
+    fun onStateSelected(state: USState) {
+        _selectedState.value = state
+        _selectedCity.value = null
+        _searchQuery.value = ""
+    }
+
+    fun onCitySelected(cityName: String) {
+        _selectedCity.value = cityName
+        _selectedState.value = null
+
+        // Find the city in the data
+        val city = USCities.values.flatten().find { it.name == cityName }
+        if (city != null) {
+            _selectedLocation.value = Pair(city!!.latitude, city!!.longitude)
+            fetchWeather(city!!.latitude, city!!.longitude)
+        }
+    }
+
     fun onSearchQueryChange(query: String) {
         _searchQuery.value = query
     }
 
     fun searchLocation(query: String) {
-        // For demo, use a few hardcoded US cities with coordinates
-        // In production, integrate with a geocoding API
-        val location = when (query.lowercase()) {
-            "new york", "nyc", "new york city" -> 40.7128 to -74.0060
-            "los angeles", "la" -> 34.0522 to -118.2437
-            "chicago" -> 41.8781 to -87.6298
-            "houston" -> 29.7604 to -95.3698
-            "phoenix" -> 33.4484 to -112.0740
-            "philadelphia" -> 39.9526 to -75.1652
-            "san antonio" -> 29.4241 to -98.4936
-            "san diego" -> 32.7157 to -117.1611
-            "dallas" -> 32.7767 to -96.7970
-            "san jose" -> 37.3382 to -121.8863
-            // ZIP codes for major cities
-            "10001" -> 40.7489 to -73.9680  // NYC
-            "90210" -> 34.0736 to -118.4004  // Beverly Hills
-            "60601" -> 41.8827 to -87.6233  // Chicago
-            "77001" -> 29.7604 to -95.3698  // Houston
-            else -> return
+        // Search through all cities by name, state, or ZIP code
+        val city = USCities.values.flatten().find { city ->
+            city.name.equals(query, ignoreCase = true) ||
+            city.zip.equals(query, ignoreCase = true) ||
+            city.state.equals(query, ignoreCase = true) ||
+            query.lowercase().let { lower ->
+                city.name.contains(lower) ||
+                "${city.state}, ${city.name}".contains(lower) ||
+                "${city.name}, ${city.state}".contains(lower)
+            }
         }
 
-        _selectedLocation.value = location
-        fetchWeather(location.first, location.second)
+        if (city != null) {
+            _selectedCity.value = city!!.name
+            _selectedState.value = USStates.find { it.code == city!!.state }
+            _selectedLocation.value = Pair(city!!.latitude, city!!.longitude)
+            fetchWeather(city!!.latitude, city!!.longitude)
+        } else {
+            _uiState.value = WeatherUiState(
+                isLoading = false,
+                error = "City not found. Try selecting from the dropdown or enter a ZIP code."
+            )
+        }
     }
 
     fun fetchWeather(lat: Double, lon: Double) {
