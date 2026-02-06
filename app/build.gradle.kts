@@ -4,6 +4,16 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose") version "2.0.20"
 }
 
+// Load keystore.properties if it exists
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = if (keystorePropertiesFile.exists()) {
+    java.util.Properties().apply {
+        load(keystorePropertiesFile.inputStream())
+    }
+} else {
+    null
+}
+
 android {
     namespace = "com.fightmonster.weatherfree"
     compileSdk = 35  // Android 16 requires latest SDK
@@ -21,13 +31,31 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            if (keystoreProperties != null) {
+                storeFile = file(keystoreProperties["STORE_FILE"] as String)
+                storePassword = keystoreProperties["STORE_PASSWORD"] as String
+                keyAlias = keystoreProperties["KEY_ALIAS"] as String
+                keyPassword = keystoreProperties["KEY_PASSWORD"] as String
+            }
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Use release signing config if keystore.properties exists
+            if (keystoreProperties != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
