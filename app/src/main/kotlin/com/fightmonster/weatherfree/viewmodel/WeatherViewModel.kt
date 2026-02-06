@@ -3,7 +3,6 @@ package com.fightmonster.weatherfree.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fightmonster.weatherfree.data.Period
-import com.fightmonster.weatherfree.data.USCity
 import com.fightmonster.weatherfree.data.USState
 import com.fightmonster.weatherfree.data.USCities
 import com.fightmonster.weatherfree.data.WeatherRepository
@@ -34,24 +33,19 @@ class WeatherViewModel : ViewModel() {
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
-    private val _selectedLocation = MutableStateFlow<Pair<Double, Double>?>(null)
-    val selectedLocation: StateFlow<Pair<Double, Double>?> = _selectedLocation.asStateFlow()
-
     fun onStateSelected(state: USState) {
         _selectedState.value = state
         _selectedCity.value = null
-        _searchQuery.value = ""
     }
 
-    fun onCitySelected(cityName: String) {
-        _selectedCity.value = cityName
-        _selectedState.value = null
-
-        // Find the city in the data
-        val city = USCities.values.flatten().find { it.name == cityName }
-        if (city != null) {
-            _selectedLocation.value = Pair(city!!.latitude, city!!.longitude)
-            fetchWeather(city!!.latitude, city!!.longitude)
+    fun onCitySelected(city: String?) {
+        _selectedCity.value = city
+        city?.let {
+            // Find city in data and get coordinates
+            val cityData = USCities.values.flatten().find { it.name == city }
+            if (cityData != null) {
+                fetchWeather(cityData!!.coordinates.first, cityData!!.coordinates.second)
+            }
         }
     }
 
@@ -59,35 +53,13 @@ class WeatherViewModel : ViewModel() {
         _searchQuery.value = query
     }
 
-    fun searchLocation(query: String) {
-        // Search through all cities by name, state, or ZIP code
-        val city = USCities.values.flatten().find { city ->
-            city.name.equals(query, ignoreCase = true) ||
-            city.zip.equals(query, ignoreCase = true) ||
-            city.state.equals(query, ignoreCase = true) ||
-            query.lowercase().let { lower ->
-                city.name.contains(lower) ||
-                "${city.state}, ${city.name}".contains(lower) ||
-                "${city.name}, ${city.state}".contains(lower)
-            }
-        }
-
-        if (city != null) {
-            _selectedCity.value = city!!.name
-            _selectedState.value = USStates.find { it.code == city!!.state }
-            _selectedLocation.value = Pair(city!!.latitude, city!!.longitude)
-            fetchWeather(city!!.latitude, city!!.longitude)
-        } else {
-            _uiState.value = WeatherUiState(
-                isLoading = false,
-                error = "City not found. Try selecting from the dropdown or enter a ZIP code."
-            )
-        }
+    fun clearError() {
+        _uiState.value = WeatherUiState()
     }
 
     fun fetchWeather(lat: Double, lon: Double) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
+            _uiState.value = WeatherUiState(
                 isLoading = true,
                 error = null
             )
@@ -107,9 +79,5 @@ class WeatherViewModel : ViewModel() {
                     )
                 }
         }
-    }
-
-    fun clearError() {
-        _uiState.value = _uiState.value.copy(error = null)
     }
 }
