@@ -23,15 +23,10 @@ android {
 
     signingConfigs {
         create("release") {
-            val keystoreFile = rootProject.file("keystore.properties")
-            if (keystoreFile.exists()) {
-                val props = java.util.Properties()
-                keystoreFile.inputStream().use { props.load(it) }
-                storeFile = file(props.getProperty("STORE_FILE"))
-                storePassword = props.getProperty("STORE_PASSWORD")
-                keyAlias = props.getProperty("KEY_ALIAS")
-                keyPassword = props.getProperty("KEY_PASSWORD")
-            }
+            storeFile = file("release.keystore")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
         }
     }
 
@@ -45,11 +40,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Use release signing config if keystore.properties exists
-            val keystoreFile = rootProject.file("keystore.properties")
-            if (keystoreFile.exists()) {
-                signingConfig = signingConfigs.getByName("release")
-            }
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
