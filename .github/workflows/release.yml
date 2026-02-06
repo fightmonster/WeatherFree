@@ -1,4 +1,4 @@
-name: Build and Release Debug APK
+name: Build and Release Signed Debug APK
 
 on:
   push:
@@ -7,12 +7,12 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Release tag (e.g., v1.0.0)'
+        description: 'Release tag (e.g. v1.0.0)'
         required: true
         default: 'v1.0.0'
 
 jobs:
-  build-debug:
+  build-signed-debug:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,11 +27,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Decode keystore from GitHub Secrets
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+          echo "✓ Keystore decoded successfully"
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build Debug APK
+      - name: Build Signed Debug APK
         run: ./gradlew assembleDebug --no-daemon
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: weatherfree
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Get version name
         id: version
@@ -44,13 +53,13 @@ jobs:
 
       - name: Rename APK file
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk WeatherFree-${{ steps.version.outputs.tag }}-debug.apk
+          cp app/build/outputs/apk/debug/app-debug.apk WeatherFree-${{ steps.version.outputs.tag }}-signed-debug.apk
 
-      - name: Upload Debug APK
+      - name: Upload Signed Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: WeatherFree-${{ steps.version.outputs.tag }}-debug
-          path: WeatherFree-${{ steps.version.outputs.tag }}-debug.apk
+          name: WeatherFree-${{ steps.version.outputs.tag }}-signed-debug
+          path: WeatherFree-${{ steps.version.outputs.tag }}-signed-debug.apk
           retention-days: 90
 
       - name: Create GitHub Release
@@ -62,7 +71,7 @@ jobs:
             ## 📱 WeatherFree ${{ steps.version.outputs.tag }}
 
             ### 📥 Download
-            - **Debug APK**: For testing and development
+            - **Signed Debug APK**: Debug build with official signing key
 
             ### ✨ Features
             - Free & Open Source
@@ -72,6 +81,9 @@ jobs:
             - 7-Day Forecast
             - Multiple US Cities Support
 
+            ### 🔒 Security
+            This APK is signed with the official WeatherFree signing key.
+
             ### ⚙️ Building from Source
             ```bash
             git clone https://github.com/fightmonster/WeatherFree.git
@@ -79,7 +91,7 @@ jobs:
             ./gradlew assembleDebug
             ```
           files: |
-            WeatherFree-${{ steps.version.outputs.tag }}-debug.apk
+            WeatherFree-${{ steps.version.outputs.tag }}-signed-debug.apk
           draft: false
           prerelease: false
         env:
