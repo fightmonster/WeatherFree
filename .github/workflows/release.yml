@@ -32,6 +32,11 @@ jobs:
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
           echo "✓ Keystore decoded successfully"
 
+      - name: Copy keystore to app directory
+        run: |
+          cp release.keystore app/release.keystore
+          echo "✓ Keystore copied to app directory"
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
