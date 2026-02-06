@@ -33,11 +33,11 @@ android {
 
     signingConfigs {
         create("release") {
-            if (keystoreProperties != null) {
-                storeFile = file(keystoreProperties["STORE_FILE"] as String)
-                storePassword = keystoreProperties["STORE_PASSWORD"] as String
-                keyAlias = keystoreProperties["KEY_ALIAS"] as String
-                keyPassword = keystoreProperties["KEY_PASSWORD"] as String
+            keystoreProperties?.let { props ->
+                storeFile = file(props.getProperty("STORE_FILE"))
+                storePassword = props.getProperty("STORE_PASSWORD")
+                keyAlias = props.getProperty("KEY_ALIAS")
+                keyPassword = props.getProperty("KEY_PASSWORD")
             }
         }
     }
