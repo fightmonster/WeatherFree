@@ -24,15 +24,17 @@ android {
     signingConfigs {
         create("release") {
             storeFile = file("release.keystore")
-            storePassword = project.findProperty("KEYSTORE_PASSWORD") as String
-            keyAlias = project.findProperty("KEY_ALIAS") as String
-            keyPassword = project.findProperty("KEY_PASSWORD") as String
+            storePassword = project.findProperty("KEYSTORE_PASSWORD") ?: ""
+            keyAlias = project.findProperty("KEY_ALIAS") ?: "weatherfree"
+            keyPassword = project.findProperty("KEY_PASSWORD") ?: ""
         }
     }
 
     buildTypes {
         debug {
-            signingConfig = signingConfigs.getByName("release")
+            // Only sign if credentials are provided
+            val hasSigning = project.findProperty("KEYSTORE_PASSWORD") != null
+            signingConfig = if (hasSigning) signingConfigs.getByName("release") else null
         }
         release {
             isMinifyEnabled = false
@@ -40,7 +42,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            val hasSigning = project.findProperty("KEYSTORE_PASSWORD") != null
+            signingConfig = if (hasSigning) signingConfigs.getByName("release") else null
         }
     }
 
