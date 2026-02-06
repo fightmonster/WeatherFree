@@ -9,7 +9,7 @@ on:
       tag_name:
         description: 'Release tag (e.g., v1.0.0)'
         required: true
-        default: 'v1.0.1'
+        default: 'v1.0.2'
       create_release:
         description: 'Create GitHub Release'
         required: true
@@ -35,20 +35,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Generate signing keystore
+      - name: Decode keystore from GitHub Secrets
         run: |
-          keytool -genkey -v \
-            -keystore release.keystore \
-            -alias weatherfree \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -storepass '${{ secrets.KEYSTORE_PASSWORD }}' \
-            -keypass '${{ secrets.KEY_PASSWORD }}' \
-            -dname 'CN=WeatherFree, OU=Development, O=FightMonster, L=City, ST=State, C=US'
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+          echo "✓ Keystore decoded successfully"
 
       - name: Create keystore properties
         run: |
@@ -56,6 +46,9 @@ jobs:
           echo "KEY_ALIAS=weatherfree" >> keystore.properties
           echo "STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> keystore.properties
           echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> keystore.properties
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --no-daemon
@@ -106,7 +99,7 @@ jobs:
 
             ### ✨ Features
             - Free & Open Source
-            - Real-time Weather Data
+            - Real-time Weather Data from National Weather Service
             - Modern UI with Jetpack Compose
             - Material You Design
             - 7-Day Forecast
@@ -114,6 +107,25 @@ jobs:
 
             ### 🔒 Security
             This release is signed with the official WeatherFree signing key.
+
+            ### ⚙️ Building from Source
+            ```bash
+            # Clone the repository
+            git clone https://github.com/fightmonster/WeatherFree.git
+            cd WeatherFree
+
+            # Build debug APK (uses auto-generated debug key)
+            ./gradlew assembleDebug
+
+            # For release signing, create your own keystore.properties:
+            # STORE_FILE=your-release.keystore
+            # KEY_ALIAS=your-alias
+            # STORE_PASSWORD=your-password
+            # KEY_PASSWORD=your-password
+
+            # Then build release APK
+            ./gradlew assembleRelease
+            ```
           files: |
             WeatherFree-${{ steps.version.outputs.tag }}-debug.apk
             WeatherFree-${{ steps.version.outputs.tag }}-release.apk
