@@ -1,0 +1,288 @@
+{
+  "states": [
+    {"name": "Alabama", "code": "AL"},
+    {"name": "Alaska", "code": "AK"},
+    {"name": "Arizona", "code": "AZ"},
+    {"name": "Arkansas", "code": "AR"},
+    {"name": "California", "code": "CA"},
+    {"name": "Colorado", "code": "CO"},
+    {"name": "Connecticut", "code": "CT"},
+    {"name": "Delaware", "code": "DE"},
+    {"name": "Florida", "code": "FL"},
+    {"name": "Georgia", "code": "GA"},
+    {"name": "Hawaii", "code": "HI"},
+    {"name": "Idaho", "code": "ID"},
+    {"name": "Illinois", "code": "IL"},
+    {"name": "Indiana", "code": "IN"},
+    {"name": "Iowa", "code": "IA"},
+    {"name": "Kansas", "code": "KS"},
+    {"name": "Kentucky", "code": "KY"},
+    {"name": "Louisiana", "code": "LA"},
+    {"name": "Maine", "code": "ME"},
+    {"name": "Maryland", "code": "MD"},
+    {"name": "Massachusetts", "code": "MA"},
+    {"name": "Michigan", "code": "MI"},
+    {"name": "Minnesota", "code": "MN"},
+    {"name": "Mississippi", "code": "MS"},
+    {"name": "Missouri", "code": "MO"},
+    {"name": "Montana", "code": "MT"},
+    {"name": "Nebraska", "code": "NE"},
+    {"name": "Nevada", "code": "NV"},
+    {"name": "New Hampshire", "code": "NH"},
+    {"name": "New Jersey", "code": "NJ"},
+    {"name": "New Mexico", "code": "NM"},
+    {"name": "New York", "code": "NY"},
+    {"name": "North Carolina", "code": "NC"},
+    {"name": "North Dakota", "code": "ND"},
+    {"name": "Ohio", "code": "OH"},
+    {"name": "Oklahoma", "code": "OK"},
+    {"name": "Oregon", "code": "OR"},
+    {"name": "Pennsylvania", "code": "PA"},
+    {"name": "Rhode Island", "code": "RI"},
+    {"name": "South Carolina", "code": "SC"},
+    {"name": "South Dakota", "code": "SD"},
+    {"name": "Tennessee", "code": "TN"},
+    {"name": "Texas", "code": "TX"},
+    {"name": "Utah", "code": "UT"},
+    {"name": "Vermont", "code": "VT"},
+    {"name": "Virginia", "code": "VA"},
+    {"name": "Washington", "code": "WA"},
+    {"name": "West Virginia", "code": "WV"},
+    {"name": "Wisconsin", "code": "WI"},
+    {"name": "Wyoming", "code": "WY"},
+    {"name": "District of Columbia", "code": "DC"}
+  ],
+  "cities": {
+    "AL": [
+      {"name": "Birmingham", "state": "AL", "zip": "35203", "latitude": 33.5207, "longitude": -86.8025},
+      {"name": "Montgomery", "state": "AL", "zip": "36101", "latitude": 32.3617, "longitude": -86.2792},
+      {"name": "Huntsville", "state": "AL", "zip": "35801", "latitude": 34.7304, "longitude": -86.5861},
+      {"name": "Mobile", "state": "AL", "zip": "36601", "latitude": 30.6944, "longitude": -88.0431}
+    ],
+    "AK": [
+      {"name": "Anchorage", "state": "AK", "zip": "99501", "latitude": 61.2181, "longitude": -149.9003},
+      {"name": "Juneau", "state": "AK", "zip": "99801", "latitude": 58.3019, "longitude": -134.4197},
+      {"name": "Fairbanks", "state": "AK", "zip": "99701", "latitude": 64.8401, "longitude": -147.72}
+    ],
+    "AZ": [
+      {"name": "Phoenix", "state": "AZ", "zip": "85001", "latitude": 33.4484, "longitude": -112.074},
+      {"name": "Tucson", "state": "AZ", "zip": "85701", "latitude": 32.2226, "longitude": -110.9747},
+      {"name": "Scottsdale", "state": "AZ", "zip": "85250", "latitude": 33.4942, "longitude": -111.9261}
+    ],
+    "AR": [
+      {"name": "Little Rock", "state": "AR", "zip": "72201", "latitude": 34.7465, "longitude": -92.2896},
+      {"name": "Fort Smith", "state": "AR", "zip": "72901", "latitude": 35.3859, "longitude": -94.3985}
+    ],
+    "CA": [
+      {"name": "Los Angeles", "state": "CA", "zip": "90001", "latitude": 34.0522, "longitude": -118.2437},
+      {"name": "San Francisco", "state": "CA", "zip": "94101", "latitude": 37.7749, "longitude": -122.4194},
+      {"name": "San Diego", "state": "CA", "zip": "92101", "latitude": 32.7157, "longitude": -117.1611},
+      {"name": "Sacramento", "state": "CA", "zip": "95801", "latitude": 38.5816, "longitude": -121.4944},
+      {"name": "San Jose", "state": "CA", "zip": "95101", "latitude": 37.3382, "longitude": -121.8863}
+    ],
+    "CO": [
+      {"name": "Denver", "state": "CO", "zip": "80201", "latitude": 39.7392, "longitude": -104.9903},
+      {"name": "Colorado Springs", "state": "CO", "zip": "80901", "latitude": 38.8339, "longitude": -104.8214},
+      {"name": "Boulder", "state": "CO", "zip": "80301", "latitude": 40.015, "longitude": -105.2705}
+    ],
+    "CT": [
+      {"name": "Hartford", "state": "CT", "zip": "06101", "latitude": 41.7658, "longitude": -72.6734},
+      {"name": "New Haven", "state": "CT", "zip": "06501", "latitude": 41.3083, "longitude": -72.9279}
+    ],
+    "DE": [
+      {"name": "Wilmington", "state": "DE", "zip": "19801", "latitude": 39.7447, "longitude": -75.5484},
+      {"name": "Dover", "state": "DE", "zip": "19901", "latitude": 39.1582, "longitude": -75.5244}
+    ],
+    "FL": [
+      {"name": "Miami", "state": "FL", "zip": "33101", "latitude": 25.7617, "longitude": -80.1918},
+      {"name": "Orlando", "state": "FL", "zip": "32801", "latitude": 28.5383, "longitude": -81.3792},
+      {"name": "Tampa", "state": "FL", "zip": "33601", "latitude": 27.9506, "longitude": -82.4572},
+      {"name": "Jacksonville", "state": "FL", "zip": "32201", "latitude": 30.3322, "longitude": -81.6557},
+      {"name": "Tallahassee", "state": "FL", "zip": "32301", "latitude": 30.4383, "longitude": -84.2807}
+    ],
+    "GA": [
+      {"name": "Atlanta", "state": "GA", "zip": "30301", "latitude": 33.749, "longitude": -84.388},
+      {"name": "Savannah", "state": "GA", "zip": "31401", "latitude": 32.0809, "longitude": -81.0912},
+      {"name": "Augusta", "state": "GA", "zip": "30901", "latitude": 33.4735, "longitude": -82.0105}
+    ],
+    "HI": [
+      {"name": "Honolulu", "state": "HI", "zip": "96801", "latitude": 21.3069, "longitude": -157.8583},
+      {"name": "Hilo", "state": "HI", "zip": "96720", "latitude": 19.7241, "longitude": -155.0874}
+    ],
+    "ID": [
+      {"name": "Boise", "state": "ID", "zip": "83701", "latitude": 43.615, "longitude": -116.2023},
+      {"name": "Idaho Falls", "state": "ID", "zip": "83401", "latitude": 43.4917, "longitude": -112.034}
+    ],
+    "IL": [
+      {"name": "Chicago", "state": "IL", "zip": "60601", "latitude": 41.8781, "longitude": -87.6298},
+      {"name": "Springfield", "state": "IL", "zip": "62701", "latitude": 39.799, "longitude": -89.6462},
+      {"name": "Aurora", "state": "IL", "zip": "60502", "latitude": 41.7606, "longitude": -88.3201}
+    ],
+    "IN": [
+      {"name": "Indianapolis", "state": "IN", "zip": "46201", "latitude": 39.7684, "longitude": -86.1581},
+      {"name": "Fort Wayne", "state": "IN", "zip": "46801", "latitude": 41.0793, "longitude": -85.1394}
+    ],
+    "IA": [
+      {"name": "Des Moines", "state": "IA", "zip": "50301", "latitude": 41.5868, "longitude": -93.625},
+      {"name": "Cedar Rapids", "state": "IA", "zip": "52401", "latitude": 41.9779, "longitude": -91.6656}
+    ],
+    "KS": [
+      {"name": "Wichita", "state": "KS", "zip": "67201", "latitude": 37.6889, "longitude": -97.3361},
+      {"name": "Topeka", "state": "KS", "zip": "66601", "latitude": 39.0473, "longitude": -95.6752}
+    ],
+    "KY": [
+      {"name": "Louisville", "state": "KY", "zip": "40201", "latitude": 38.2527, "longitude": -85.7585},
+      {"name": "Lexington", "state": "KY", "zip": "40502", "latitude": 38.0406, "longitude": -84.5037}
+    ],
+    "LA": [
+      {"name": "New Orleans", "state": "LA", "zip": "70112", "latitude": 29.9511, "longitude": -90.0715},
+      {"name": "Baton Rouge", "state": "LA", "zip": "70801", "latitude": 30.4515, "longitude": -91.1871}
+    ],
+    "ME": [
+      {"name": "Portland", "state": "ME", "zip": "04101", "latitude": 43.6591, "longitude": -70.2568},
+      {"name": "Augusta", "state": "ME", "zip": "04330", "latitude": 44.3106, "longitude": -69.7795}
+    ],
+    "MD": [
+      {"name": "Baltimore", "state": "MD", "zip": "21201", "latitude": 39.2904, "longitude": -76.6122},
+      {"name": "Annapolis", "state": "MD", "zip": "21401", "latitude": 38.9784, "longitude": -76.4922}
+    ],
+    "MA": [
+      {"name": "Boston", "state": "MA", "zip": "02101", "latitude": 42.3601, "longitude": -71.0589},
+      {"name": "Worcester", "state": "MA", "zip": "01601", "latitude": 42.2626, "longitude": -71.8023}
+    ],
+    "MI": [
+      {"name": "Detroit", "state": "MI", "zip": "48201", "latitude": 42.3314, "longitude": -83.0458},
+      {"name": "Grand Rapids", "state": "MI", "zip": "49501", "latitude": 42.9634, "longitude": -85.6678},
+      {"name": "Lansing", "state": "MI", "zip": "48901", "latitude": 42.7325, "longitude": -84.5555}
+    ],
+    "MN": [
+      {"name": "Minneapolis", "state": "MN", "zip": "55401", "latitude": 44.9778, "longitude": -93.265},
+      {"name": "Saint Paul", "state": "MN", "zip": "55101", "latitude": 44.9537, "longitude": -93.0897}
+    ],
+    "MS": [
+      {"name": "Jackson", "state": "MS", "zip": "39201", "latitude": 32.2988, "longitude": -90.1848},
+      {"name": "Gulfport", "state": "MS", "zip": "39501", "latitude": 30.3674, "longitude": -89.0928}
+    ],
+    "MO": [
+      {"name": "Kansas City", "state": "MO", "zip": "64101", "latitude": 39.0997, "longitude": -94.5786},
+      {"name": "Saint Louis", "state": "MO", "zip": "63101", "latitude": 38.627, "longitude": -90.1994},
+      {"name": "Jefferson City", "state": "MO", "zip": "65101", "latitude": 38.5767, "longitude": -92.1735}
+    ],
+    "MT": [
+      {"name": "Billings", "state": "MT", "zip": "59101", "latitude": 45.7833, "longitude": -108.5007},
+      {"name": "Helena", "state": "MT", "zip": "59601", "latitude": 46.5891, "longitude": -112.0391}
+    ],
+    "NE": [
+      {"name": "Omaha", "state": "NE", "zip": "68101", "latitude": 41.2565, "longitude": -95.9345},
+      {"name": "Lincoln", "state": "NE", "zip": "68501", "latitude": 40.8136, "longitude": -96.7026}
+    ],
+    "NV": [
+      {"name": "Las Vegas", "state": "NV", "zip": "89101", "latitude": 36.1699, "longitude": -115.1398},
+      {"name": "Reno", "state": "NV", "zip": "89501", "latitude": 39.5296, "longitude": -119.8138},
+      {"name": "Carson City", "state": "NV", "zip": "89701", "latitude": 39.1638, "longitude": -119.7674}
+    ],
+    "NH": [
+      {"name": "Manchester", "state": "NH", "zip": "03101", "latitude": 42.9956, "longitude": -71.4548},
+      {"name": "Concord", "state": "NH", "zip": "03301", "latitude": 43.2081, "longitude": -71.5375}
+    ],
+    "NJ": [
+      {"name": "Newark", "state": "NJ", "zip": "07101", "latitude": 40.7357, "longitude": -74.1724},
+      {"name": "Jersey City", "state": "NJ", "zip": "07302", "latitude": 40.7178, "longitude": -74.0431},
+      {"name": "Trenton", "state": "NJ", "zip": "08601", "latitude": 40.217, "longitude": -74.7429}
+    ],
+    "NM": [
+      {"name": "Albuquerque", "state": "NM", "zip": "87101", "latitude": 35.0844, "longitude": -106.6504},
+      {"name": "Santa Fe", "state": "NM", "zip": "87501", "latitude": 35.687, "longitude": -105.9378}
+    ],
+    "NY": [
+      {"name": "New York", "state": "NY", "zip": "10001", "latitude": 40.7128, "longitude": -74.006},
+      {"name": "Buffalo", "state": "NY", "zip": "14201", "latitude": 42.8864, "longitude": -78.8784},
+      {"name": "Rochester", "state": "NY", "zip": "14602", "latitude": 43.1566, "longitude": -77.6088},
+      {"name": "Albany", "state": "NY", "zip": "12201", "latitude": 42.6526, "longitude": -73.7562}
+    ],
+    "NC": [
+      {"name": "Charlotte", "state": "NC", "zip": "28201", "latitude": 35.2271, "longitude": -80.8431},
+      {"name": "Raleigh", "state": "NC", "zip": "27601", "latitude": 35.7796, "longitude": -78.6382},
+      {"name": "Asheville", "state": "NC", "zip": "28801", "latitude": 35.5951, "longitude": -82.5515}
+    ],
+    "ND": [
+      {"name": "Fargo", "state": "ND", "zip": "58102", "latitude": 46.8772, "longitude": -96.7898},
+      {"name": "Bismarck", "state": "ND", "zip": "58501", "latitude": 46.8083, "longitude": -100.7837}
+    ],
+    "OH": [
+      {"name": "Columbus", "state": "OH", "zip": "43201", "latitude": 39.9612, "longitude": -82.9988},
+      {"name": "Cleveland", "state": "OH", "zip": "44101", "latitude": 41.4993, "longitude": -81.6944},
+      {"name": "Cincinnati", "state": "OH", "zip": "45201", "latitude": 39.1031, "longitude": -84.512}
+    ],
+    "OK": [
+      {"name": "Oklahoma City", "state": "OK", "zip": "73101", "latitude": 35.4676, "longitude": -97.5164},
+      {"name": "Tulsa", "state": "OK", "zip": "74101", "latitude": 36.154, "longitude": -95.9928}
+    ],
+    "OR": [
+      {"name": "Portland", "state": "OR", "zip": "97201", "latitude": 45.5152, "longitude": -122.6784},
+      {"name": "Salem", "state": "OR", "zip": "97301", "latitude": 44.9429, "longitude": -123.0351}
+    ],
+    "PA": [
+      {"name": "Philadelphia", "state": "PA", "zip": "19101", "latitude": 39.9526, "longitude": -75.1652},
+      {"name": "Pittsburgh", "state": "PA", "zip": "15201", "latitude": 40.4406, "longitude": -79.9959},
+      {"name": "Harrisburg", "state": "PA", "zip": "17101", "latitude": 40.2732, "longitude": -76.8867}
+    ],
+    "RI": [
+      {"name": "Providence", "state": "RI", "zip": "02901", "latitude": 41.824, "longitude": -71.4128},
+      {"name": "Newport", "state": "RI", "zip": "02840", "latitude": 41.4901, "longitude": -71.3128}
+    ],
+    "SC": [
+      {"name": "Charleston", "state": "SC", "zip": "29401", "latitude": 32.7765, "longitude": -79.9309},
+      {"name": "Columbia", "state": "SC", "zip": "29201", "latitude": 34.0007, "longitude": -81.0348}
+    ],
+    "SD": [
+      {"name": "Sioux Falls", "state": "SD", "zip": "57101", "latitude": 43.546, "longitude": -96.7313},
+      {"name": "Pierre", "state": "SD", "zip": "57501", "latitude": 44.3683, "longitude": -100.3512}
+    ],
+    "TN": [
+      {"name": "Nashville", "state": "TN", "zip": "37201", "latitude": 36.1627, "longitude": -86.7816},
+      {"name": "Memphis", "state": "TN", "zip": "38101", "latitude": 35.1495, "longitude": -90.049},
+      {"name": "Knoxville", "state": "TN", "zip": "37901", "latitude": 35.9606, "longitude": -83.9207}
+    ],
+    "TX": [
+      {"name": "Houston", "state": "TX", "zip": "77001", "latitude": 29.7604, "longitude": -95.3698},
+      {"name": "Dallas", "state": "TX", "zip": "75201", "latitude": 32.7767, "longitude": -96.797},
+      {"name": "Austin", "state": "TX", "zip": "73301", "latitude": 30.2672, "longitude": -97.7431},
+      {"name": "San Antonio", "state": "TX", "zip": "78201", "latitude": 29.4241, "longitude": -98.4936},
+      {"name": "El Paso", "state": "TX", "zip": "79901", "latitude": 31.7619, "longitude": -106.485}
+    ],
+    "UT": [
+      {"name": "Salt Lake City", "state": "UT", "zip": "84101", "latitude": 40.7608, "longitude": -111.891},
+      {"name": "Provo", "state": "UT", "zip": "84601", "latitude": 40.2338, "longitude": -111.6585}
+    ],
+    "VT": [
+      {"name": "Burlington", "state": "VT", "zip": "05401", "latitude": 44.4759, "longitude": -73.2121},
+      {"name": "Montpelier", "state": "VT", "zip": "05601", "latitude": 44.2601, "longitude": -72.5754}
+    ],
+    "VA": [
+      {"name": "Virginia Beach", "state": "VA", "zip": "23450", "latitude": 36.8529, "longitude": -75.978},
+      {"name": "Richmond", "state": "VA", "zip": "23218", "latitude": 37.5407, "longitude": -77.436},
+      {"name": "Norfolk", "state": "VA", "zip": "23501", "latitude": 36.8508, "longitude": -76.2859}
+    ],
+    "WA": [
+      {"name": "Seattle", "state": "WA", "zip": "98101", "latitude": 47.6062, "longitude": -122.3321},
+      {"name": "Spokane", "state": "WA", "zip": "99201", "latitude": 47.6588, "longitude": -117.426},
+      {"name": "Olympia", "state": "WA", "zip": "98501", "latitude": 47.0379, "longitude": -122.9007}
+    ],
+    "WV": [
+      {"name": "Charleston", "state": "WV", "zip": "25301", "latitude": 38.3498, "longitude": -81.6326},
+      {"name": "Huntington", "state": "WV", "zip": "25701", "latitude": 38.4192, "longitude": -82.4452}
+    ],
+    "WI": [
+      {"name": "Milwaukee", "state": "WI", "zip": "53201", "latitude": 43.0389, "longitude": -87.9065},
+      {"name": "Madison", "state": "WI", "zip": "53701", "latitude": 43.0731, "longitude": -89.4012}
+    ],
+    "WY": [
+      {"name": "Cheyenne", "state": "WY", "zip": "82001", "latitude": 41.14, "longitude": -104.8202},
+      {"name": "Casper", "state": "WY", "zip": "82601", "latitude": 42.8501, "longitude": -106.3252}
+    ],
+    "DC": [
+      {"name": "Washington", "state": "DC", "zip": "20001", "latitude": 38.9072, "longitude": -77.0369}
+    ]
+  }
+}

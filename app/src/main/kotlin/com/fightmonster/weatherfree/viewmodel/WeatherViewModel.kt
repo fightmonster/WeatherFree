@@ -4,12 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fightmonster.weatherfree.data.Period
 import com.fightmonster.weatherfree.data.USState
-import com.fightmonster.weatherfree.data.USCities
+import com.fightmonster.weatherfree.data.USLocations
 import com.fightmonster.weatherfree.data.WeatherRepository
+import com.fightmonster.weatherfree.data.Location
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+
+enum class SearchMode {
+    STATE_CITY,  // 选择州和城市
+    SEARCH       // 智能搜索（地址、城市名、ZIP码）
+}
 
 data class WeatherUiState(
     val isLoading: Boolean = false,
@@ -33,6 +39,17 @@ class WeatherViewModel : ViewModel() {
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
+    private val _searchMode = MutableStateFlow(SearchMode.STATE_CITY)
+    val searchMode: StateFlow<SearchMode> = _searchMode.asStateFlow()
+
+    fun setSearchMode(mode: SearchMode) {
+        _searchMode.value = mode
+        _selectedState.value = null
+        _selectedCity.value = null
+        _searchQuery.value = ""
+        _uiState.value = WeatherUiState()
+    }
+
     fun onStateSelected(state: USState) {
         _selectedState.value = state
         _selectedCity.value = null
@@ -40,10 +57,14 @@ class WeatherViewModel : ViewModel() {
 
     fun onCitySelected(city: String?) {
         _selectedCity.value = city
-        city?.let {
-            val cityData = USCities.values.flatten().find { it.name == city }
-            if (cityData != null) {
-                fetchWeather(cityData!!.latitude, cityData!!.longitude)
+        city?.let { cityName ->
+            // Try to find city in selected state first, then fall back to all cities
+            val cityData = _selectedState.value?.code?.let { stateCode ->
+                USLocations.USCities[stateCode]?.find { it.name == cityName }
+            } ?: USLocations.USCities.values.flatten().find { it.name == cityName }
+
+            cityData?.let {
+                fetchWeather(it.latitude, it.longitude)
             }
         }
     }
@@ -54,6 +75,47 @@ class WeatherViewModel : ViewModel() {
 
     fun clearError() {
         _uiState.value = WeatherUiState()
+    }
+
+    /**
+     * Smart search - automatically detects input type
+     * Supports: addresses, city names, ZIP codes (U.S. and international)
+     */
+    fun search(query: String) {
+        if (query.isBlank()) return
+        searchLocation(query)
+    }
+
+    /**
+     * Legacy method for backward compatibility
+     */
+    @Deprecated("Use search() instead", ReplaceWith("search(query)"))
+    fun searchByAddress(address: String) = search(address)
+
+    @Deprecated("Use search() instead", ReplaceWith("search(query)"))
+    fun searchByZipCode(zipCode: String) = search(zipCode)
+
+    /**
+     * Unified search method - fetches weather for any location
+     */
+    private fun searchLocation(query: String) {
+        viewModelScope.launch {
+            _uiState.value = WeatherUiState(
+                isLoading = true,
+                error = null
+            )
+
+            repository.search(query)
+                .onSuccess { location ->
+                    fetchWeather(location.latitude, location.longitude)
+                }
+                .onFailure { e ->
+                    _uiState.value = WeatherUiState(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
+        }
     }
 
     fun fetchWeather(lat: Double, lon: Double) {

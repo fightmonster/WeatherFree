@@ -3,7 +3,9 @@ package com.fightmonster.weatherfree.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
@@ -22,18 +24,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fightmonster.weatherfree.data.Period
 import com.fightmonster.weatherfree.data.USCity
-import com.fightmonster.weatherfree.data.USStates
-import com.fightmonster.weatherfree.data.USCities
+import com.fightmonster.weatherfree.data.USLocations
 import com.fightmonster.weatherfree.viewmodel.WeatherViewModel
+import com.fightmonster.weatherfree.viewmodel.SearchMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherScreen(viewModel: WeatherViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     val selectedState by viewModel.selectedState.collectAsState()
-    val cities: List<USCity> = remember(selectedState) { state ->
+    val searchMode by viewModel.searchMode.collectAsState()
+    val cities: List<USCity> = remember(selectedState) {
+        val state = selectedState
         if (state != null) {
-            USCities[state!!.code] ?: emptyList()
+            USLocations.USCities[state.code] ?: emptyList()
         } else {
             emptyList()
         }
@@ -55,25 +59,42 @@ fun WeatherScreen(viewModel: WeatherViewModel = viewModel()) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            // Search Mode Selector
+            TabRow(
+                selectedTabIndex = searchMode.ordinal,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                StateSelector(
-                    states = USStates,
-                    selectedState = selectedState,
-                    onStateSelected = { state ->
-                        viewModel.onStateSelected(state)
-                        viewModel.onCitySelected(null)
-                    }
+                Tab(
+                    selected = searchMode == SearchMode.STATE_CITY,
+                    onClick = { viewModel.setSearchMode(SearchMode.STATE_CITY) },
+                    text = { Text("State & City") }
                 )
+                Tab(
+                    selected = searchMode == SearchMode.SEARCH,
+                    onClick = { viewModel.setSearchMode(SearchMode.SEARCH) },
+                    text = { Text("Search") }
+                )
+            }
 
-                if (selectedState != null) {
-                    CitySelector(
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Search UI based on mode
+            when (searchMode) {
+                SearchMode.STATE_CITY -> {
+                    StateCitySearchContent(
+                        selectedState = selectedState,
                         cities = cities,
                         selectedCity = viewModel.selectedCity.collectAsState().value,
                         searchQuery = viewModel.searchQuery.collectAsState().value,
+                        onStateSelected = { viewModel.onStateSelected(it) },
                         onCitySelected = { viewModel.onCitySelected(it) },
+                        onSearchQueryChange = { viewModel.onSearchQueryChange(it) }
+                    )
+                }
+                SearchMode.SEARCH -> {
+                    SmartSearchContent(
+                        searchQuery = viewModel.searchQuery.collectAsState().value,
+                        onSearch = { viewModel.search(it) },
                         onSearchQueryChange = { viewModel.onSearchQueryChange(it) }
                     )
                 }
@@ -81,6 +102,7 @@ fun WeatherScreen(viewModel: WeatherViewModel = viewModel()) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Weather Display
             when {
                 uiState.isLoading -> {
                     Box(
@@ -110,6 +132,7 @@ fun WeatherScreen(viewModel: WeatherViewModel = viewModel()) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StateSelector(
     states: List<com.fightmonster.weatherfree.data.USState>,
@@ -118,6 +141,11 @@ fun StateSelector(
 ) {
     var expanded by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
+
+    // Sync searchText with selectedState
+    androidx.compose.runtime.LaunchedEffect(selectedState) {
+        searchText = selectedState?.name ?: ""
+    }
 
     val filteredStates: List<com.fightmonster.weatherfree.data.USState> = remember(searchText) {
         if (searchText.isEmpty()) {
@@ -128,12 +156,12 @@ fun StateSelector(
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth().weight(1f),
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
         )
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(8.dp)) {
             Text(
                 text = "Select State",
                 style = MaterialTheme.typography.titleMedium,
@@ -142,8 +170,14 @@ fun StateSelector(
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
-                onExpandedChange = { expanded = it }
-            ) { exposedBox ->
+                onExpandedChange = {
+                    expanded = it
+                    if (it) {
+                        // Clear search when opening menu to show all items
+                        searchText = ""
+                    }
+                }
+            ) {
                 OutlinedTextField(
                     value = searchText,
                     onValueChange = { searchText = it },
@@ -153,42 +187,41 @@ fun StateSelector(
                     },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     singleLine = true,
-                    modifier = Modifier.menuAnchor(ExposedDropdownMenuBoxScope.MenuAnchor)
+                    modifier = Modifier.menuAnchor()
                 )
 
                 ExposedDropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.heightIn(max = 300.dp)
                 ) {
-                    LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
-                        items(filteredStates) { state ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        text = state.name,
-                                        color = if (selectedState?.code == state.code) {
-                                            MaterialTheme.colorScheme.primary
-                                        } else {
-                                            MaterialTheme.colorScheme.onSurface
-                                        }
-                                    )
-                                },
-                                leadingIcon = if (selectedState?.code == state.code) {
-                                    {
-                                        Icon(
-                                                imageVector = Icons.Default.Check,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary
-                                        )
+                    filteredStates.forEach { state ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = state.name,
+                                    color = if (selectedState?.code == state.code) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface
                                     }
-                                } else null,
-                                onClick = {
-                                    onStateSelected(state)
-                                    expanded = false
-                                    searchText = state.name
+                                )
+                            },
+                            leadingIcon = if (selectedState?.code == state.code) {
+                                {
+                                    Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary
+                                    )
                                 }
-                            )
-                        }
+                            } else null,
+                            onClick = {
+                                onStateSelected(state)
+                                expanded = false
+                                searchText = state.name
+                            }
+                        )
                     }
                 }
             }
@@ -196,6 +229,7 @@ fun StateSelector(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CitySelector(
     cities: List<USCity>,
@@ -206,7 +240,7 @@ fun CitySelector(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val filteredCities: List<USCity> = remember(searchQuery) {
+    val filteredCities: List<USCity> = remember(searchQuery, cities) {
         if (searchQuery.isEmpty()) {
             cities
         } else {
@@ -219,12 +253,12 @@ fun CitySelector(
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth().weight(1f),
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
         )
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(8.dp)) {
             Text(
                 text = "Select City",
                 style = MaterialTheme.typography.titleMedium,
@@ -233,8 +267,10 @@ fun CitySelector(
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
-                onExpandedChange = { expanded = it }
-            ) { exposedBox ->
+                onExpandedChange = {
+                    expanded = it
+                }
+            ) {
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = onSearchQueryChange,
@@ -244,52 +280,53 @@ fun CitySelector(
                     },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     singleLine = true,
-                    modifier = Modifier.menuAnchor(ExposedDropdownMenuBoxScope.MenuAnchor)
+                    modifier = Modifier.menuAnchor()
                 )
 
                 ExposedDropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier
+                        .heightIn(max = 400.dp)
+                        .exposedDropdownSize(true)
                 ) {
-                    LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
-                        items(filteredCities) { city ->
-                            DropdownMenuItem(
-                                text = {
-                                    Column {
-                                        Text(
-                                                text = city.name,
-                                                color = if (selectedCity == city.name) {
-                                                    MaterialTheme.colorScheme.primary
-                                                } else {
-                                                    MaterialTheme.colorScheme.onSurface
-                                                }
-                                                )
-                                        Text(
-                                                text = "${city.state} - ${city.zip}",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = if (selectedCity == city.name) {
-                                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                                                } else {
-                                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                                }
-                                                )
-                                    }
-                                },
-                                leadingIcon = if (selectedCity == city.name) {
-                                    {
-                                        Icon(
-                                                imageVector = Icons.Default.Check,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
-                                } else null,
-                                onClick = {
-                                    onCitySelected(city.name)
-                                    expanded = false
+                    filteredCities.forEach { city ->
+                        DropdownMenuItem(
+                            text = {
+                                Column {
+                                    Text(
+                                            text = city.name,
+                                            color = if (selectedCity == city.name) {
+                                                MaterialTheme.colorScheme.primary
+                                            } else {
+                                                MaterialTheme.colorScheme.onSurface
+                                            }
+                                            )
+                                    Text(
+                                            text = "${city.state} - ${city.zip}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = if (selectedCity == city.name) {
+                                                MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                                            } else {
+                                                MaterialTheme.colorScheme.onSurfaceVariant
+                                            }
+                                            )
                                 }
-                            )
-                        }
+                            },
+                            leadingIcon = if (selectedCity == city.name) {
+                                {
+                                    Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            } else null,
+                            onClick = {
+                                onCitySelected(city.name)
+                                expanded = false
+                            }
+                        )
                     }
                 }
             }
@@ -302,7 +339,11 @@ fun WeatherContent(
     currentWeather: Period,
     forecast: List<Period>
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+    ) {
         CurrentWeatherCard(weather = currentWeather)
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -315,8 +356,8 @@ fun WeatherContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(forecast.take(7)) { period ->
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            forecast.take(7).forEach { period ->
                 ForecastItem(period = period)
             }
         }
@@ -356,7 +397,9 @@ fun CurrentWeatherCard(weather: Period) {
             Text(
                 text = weather.shortForecast,
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -500,8 +543,7 @@ fun EmptyState() {
     ) {
         Column(
             modifier = Modifier.padding(48.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalAlignment = Alignment.CenterVertically
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -538,3 +580,129 @@ fun EmptyState() {
         }
     }
 }
+
+// New search mode components
+@Composable
+fun StateCitySearchContent(
+    selectedState: com.fightmonster.weatherfree.data.USState?,
+    cities: List<USCity>,
+    selectedCity: String?,
+    searchQuery: String,
+    onStateSelected: (com.fightmonster.weatherfree.data.USState) -> Unit,
+    onCitySelected: (String?) -> Unit,
+    onSearchQueryChange: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        StateSelector(
+            states = USLocations.USStates,
+            selectedState = selectedState,
+            onStateSelected = { state ->
+                onStateSelected(state)
+                onCitySelected(null)
+                onSearchQueryChange("")
+            }
+        )
+
+        if (selectedState != null) {
+            CitySelector(
+                cities = cities,
+                selectedCity = selectedCity,
+                searchQuery = searchQuery,
+                onCitySelected = onCitySelected,
+                onSearchQueryChange = onSearchQueryChange
+            )
+        }
+    }
+}
+
+/**
+ * Smart search component - automatically detects input type
+ * Supports: addresses, city names, ZIP codes (U.S. and international)
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SmartSearchContent(
+    searchQuery: String,
+    onSearch: (String) -> Unit,
+    onSearchQueryChange: (String) -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+        )
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(
+                text = "Smart Search",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChange,
+                placeholder = {
+                    Text("Enter city, address, or ZIP code")
+                },
+                leadingIcon = {
+                    Icon(imageVector = Icons.Default.Search, contentDescription = null)
+                },
+                trailingIcon = {
+                    IconButton(onClick = { onSearch(searchQuery) }) {
+                        Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "Search")
+                    }
+                },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = { onSearch(searchQuery) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = searchQuery.isNotBlank()
+            ) {
+                Text("Get Weather")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Example searches
+            Text(
+                text = "Examples:",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Text(
+                text = "• New York, NY",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+            )
+            Text(
+                text = "• 10001",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+            )
+            Text(
+                text = "• 1600 Pennsylvania Ave, Washington, DC",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+            )
+        }
+    }
+}
+
+@Deprecated("Use SmartSearchContent instead")
+@Composable
+fun ZipCodeSearchContent(
+    searchQuery: String,
+    onSearch: (String) -> Unit,
+    onSearchQueryChange: (String) -> Unit
+) = SmartSearchContent(searchQuery, onSearch, onSearchQueryChange)

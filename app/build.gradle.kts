@@ -10,10 +10,10 @@ android {
 
     defaultConfig {
         applicationId = "com.fightmonster.weatherfree"
-        minSdk = 35  // Android 16 (API Level 35)
+        minSdk = 24  // Android 7.0 (API Level 24)
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 8
+        versionName = "1.0.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -32,12 +32,8 @@ android {
 
     buildTypes {
         debug {
-            val hasSigning = System.getenv("KEYSTORE_PASSWORD") != null
-            if (hasSigning) {
-                signingConfig = signingConfigs.getByName("release")
-            } else {
-                signingConfig = null
-            }
+            // Use default debug signing (automatically created by Android)
+            signingConfig = android.signingConfigs.findByName("debug")
         }
         release {
             isMinifyEnabled = false
@@ -48,8 +44,6 @@ android {
             val hasSigning = System.getenv("KEYSTORE_PASSWORD") != null
             if (hasSigning) {
                 signingConfig = signingConfigs.getByName("release")
-            } else {
-                signingConfig = null
             }
         }
     }
@@ -96,6 +90,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("com.google.code.gson:gson:2.10.1")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
